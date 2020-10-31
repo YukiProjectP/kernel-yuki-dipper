@@ -673,6 +673,6 @@ int dsi_display_get_panel_vfp(void *display,
 
 struct dsi_display *get_main_display(void);
 
-void dsi_display_set_fod_ui(struct dsi_display *display, bool status);
 
+void dsi_display_set_fod_ui(struct dsi_display *display, bool status);
 #endif /* _DSI_DISPLAY_H_ */
