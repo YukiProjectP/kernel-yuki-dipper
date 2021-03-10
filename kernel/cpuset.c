@@ -1853,24 +1853,24 @@ static s64 cpuset_read_s64(struct cgroup_subsys_state *css, struct cftype *cft)
 }
 
 #ifdef CONFIG_UCLAMP_TASK_GROUP
-int cpu_uclamp_min_show(struct seq_file *sf, void *v);
-int cpu_uclamp_max_show(struct seq_file *sf, void *v);
+int cpu_uclamp_min_show_wrapper(struct seq_file *sf, void *v);
+int cpu_uclamp_max_show_wrapper(struct seq_file *sf, void *v);
 
-ssize_t cpu_uclamp_min_write(struct kernfs_open_file *of,
+ssize_t cpu_uclamp_min_write_wrapper(struct kernfs_open_file *of,
 				    char *buf, size_t nbytes,
 				    loff_t off);
-ssize_t cpu_uclamp_max_write(struct kernfs_open_file *of,
+ssize_t cpu_uclamp_max_write_wrapper(struct kernfs_open_file *of,
 				    char *buf, size_t nbytes,
 				    loff_t off);
 
-int cpu_uclamp_ls_write_u64(struct cgroup_subsys_state *css,
+int cpu_uclamp_ls_write_u64_wrapper(struct cgroup_subsys_state *css,
 				   struct cftype *cftype, u64 ls);
-u64 cpu_uclamp_ls_read_u64(struct cgroup_subsys_state *css,
+u64 cpu_uclamp_ls_read_u64_wrapper(struct cgroup_subsys_state *css,
 				  struct cftype *cft);
 
-int cpu_uclamp_boost_write_u64(struct cgroup_subsys_state *css,
+int cpu_uclamp_boost_write_u64_wrapper(struct cgroup_subsys_state *css,
 				   struct cftype *cftype, u64 boost);
-u64 cpu_uclamp_boost_read_u64(struct cgroup_subsys_state *css,
+u64 cpu_uclamp_boost_read_u64_wrapper(struct cgroup_subsys_state *css,
 				  struct cftype *cft);
 
 #if !defined(CONFIG_SCHED_TUNE)
@@ -1880,7 +1880,7 @@ static u64 st_boost_read(struct cgroup_subsys_state *css,
 	if (!strlen(css->cgroup->kn->name))
 		return -EINVAL;
 
-	return cpu_uclamp_boost_read_u64(css, cft);
+	return cpu_uclamp_boost_read_u64_wrapper(css, cft);
 }
 
 static int st_boost_write(struct cgroup_subsys_state *css,
@@ -1889,7 +1889,7 @@ static int st_boost_write(struct cgroup_subsys_state *css,
 	if (!strlen(css->cgroup->kn->name))
 		return -EINVAL;
 
-	return cpu_uclamp_boost_write_u64(css, cft, boost);
+	return cpu_uclamp_boost_write_u64_wrapper(css, cft, boost);
 }
 
 static u64 st_prefer_idle_read(struct cgroup_subsys_state *css,
@@ -1898,7 +1898,7 @@ static u64 st_prefer_idle_read(struct cgroup_subsys_state *css,
 	if (!strlen(css->cgroup->kn->name))
 		return -EINVAL;
 
-	return cpu_uclamp_ls_read_u64(css, cft);
+	return cpu_uclamp_ls_read_u64_wrapper(css, cft);
 }
 
 static int st_prefer_idle_write(struct cgroup_subsys_state *css,
@@ -1907,7 +1907,7 @@ static int st_prefer_idle_write(struct cgroup_subsys_state *css,
 	if (!strlen(css->cgroup->kn->name))
 		return -EINVAL;
 
-	return cpu_uclamp_ls_write_u64(css, cft, prefer_idle);
+	return cpu_uclamp_ls_write_u64_wrapper(css, cft, prefer_idle);
 }
 #endif
 
@@ -2019,26 +2019,26 @@ static struct cftype files[] = {
 	{
 		.name = "uclamp.min",
 		.flags = CFTYPE_NOT_ON_ROOT,
-		.seq_show = cpu_uclamp_min_show,
-		.write = cpu_uclamp_min_write,
+		.seq_show = cpu_uclamp_min_show_wrapper,
+		.write = cpu_uclamp_min_write_wrapper,
 	},
 	{
 		.name = "uclamp.max",
 		.flags = CFTYPE_NOT_ON_ROOT,
-		.seq_show = cpu_uclamp_max_show,
-		.write = cpu_uclamp_max_write,
+		.seq_show = cpu_uclamp_max_show_wrapper,
+		.write = cpu_uclamp_max_write_wrapper,
 	},
 	{
 		.name = "uclamp.latency_sensitive",
 		.flags = CFTYPE_NOT_ON_ROOT,
-		.read_u64 = cpu_uclamp_ls_read_u64,
-		.write_u64 = cpu_uclamp_ls_write_u64,
+		.read_u64 = cpu_uclamp_ls_read_u64_wrapper,
+		.write_u64 = cpu_uclamp_ls_write_u64_wrapper,
 	},
 	{
 		.name = "uclamp.boosted",
 		.flags = CFTYPE_NOT_ON_ROOT,
-		.read_u64 = cpu_uclamp_boost_read_u64,
-		.write_u64 = cpu_uclamp_boost_write_u64,
+		.read_u64 = cpu_uclamp_boost_read_u64_wrapper,
+		.write_u64 = cpu_uclamp_boost_write_u64_wrapper,
 	},
 
 #if !defined(CONFIG_SCHED_TUNE)
