@@ -78,7 +78,10 @@ struct msm_watchdog_data {
 	unsigned int min_slack_ticks;
 	unsigned long long min_slack_ns;
 	void *scm_regsave;
-	cpumask_t alive_mask;
+	atomic_t alive_mask;
+	atomic_t pinged_mask;
+	//try to import
+	//cpumask_t alive_mask;
 	struct mutex disable_lock;
 	bool irq_ppi;
 	struct msm_watchdog_data __percpu **wdog_cpu_dd;
@@ -134,8 +137,10 @@ static void dump_cpu_alive_mask(struct msm_watchdog_data *wdog_dd)
 {
 	static char alive_mask_buf[MASK_SIZE];
 
-	scnprintf(alive_mask_buf, MASK_SIZE, "%*pb1", cpumask_pr_args(
-				&wdog_dd->alive_mask));
+	/*scnprintf(alive_mask_buf, MASK_SIZE, "%*pb1", cpumask_pr_args(
+				&wdog_dd->alive_mask));*/
+	scnprintf(alive_mask_buf, MASK_SIZE, "%x",
+		  atomic_read(&wdog_dd->alive_mask));
 	dev_info(wdog_dd->dev, "cpu alive mask from last pet %s\n",
 				alive_mask_buf);
 }
@@ -374,30 +379,68 @@ static void pet_watchdog(struct msm_watchdog_data *wdog_dd)
 
 static void keep_alive_response(void *info)
 {
-	int cpu = smp_processor_id();
-	struct msm_watchdog_data *wdog_dd = (struct msm_watchdog_data *)info;
+	/* Make sure alive mask is cleared and set in order */	
+	struct msm_watchdog_data *wdog_dd = wdog_data;
+	unsigned int this_cpu_bit = (unsigned long)info >> 32;
+	unsigned int final_alive_mask = (unsigned int)(long)info;
+	unsigned int old;
 
-	cpumask_set_cpu(cpu, &wdog_dd->alive_mask);
-	/* Make sure alive mask is cleared and set in order */
-	smp_mb();
+	/* Wake up the watchdog task if we're the final pinged CPU */
+	old = atomic_fetch_or_relaxed(this_cpu_bit, &wdog_data->alive_mask);
+	if (old == (final_alive_mask & ~this_cpu_bit))
+		wake_up_process(wdog_dd->watchdog_task);
 }
 
 /*
  * If this function does not return, it implies one of the
  * other cpu's is not responsive.
  */
+static DEFINE_PER_CPU_SHARED_ALIGNED(struct call_single_data, csd_data);
+
 static void ping_other_cpus(struct msm_watchdog_data *wdog_dd)
 {
-	int cpu;
-
-	cpumask_clear(&wdog_dd->alive_mask);
+	//int cpu;
+	unsigned long online_mask, ping_mask = 0;
+	unsigned int final_alive_mask;
+	int cpu, this_cpu;
+	//cpumask_clear(&wdog_dd->alive_mask);
 	/* Make sure alive mask is cleared and set in order */
-	smp_mb();
+	/*smp_mb();
 	for_each_cpu(cpu, cpu_online_mask) {
 		if (!cpu_idle_pc_state[cpu] && !cpu_isolated(cpu))
 			smp_call_function_single(cpu, keep_alive_response,
 						 wdog_dd, 1);
+	}*/
+	/*
+	 * Ping all CPUs other than the current one asynchronously so that we
+	 * don't spend a lot of time spinning on the current CPU with IRQs
+	 * disabled (which is what smp_call_function_single() does in
+	 * synchronous mode).
+	 */
+	preempt_disable();
+	this_cpu = raw_smp_processor_id();
+	atomic_set(&wdog_dd->alive_mask, BIT(this_cpu));
+	online_mask = *cpumask_bits(cpu_online_mask) & ~BIT(this_cpu);
+	for_each_cpu(cpu, to_cpumask(&online_mask)) {
+		if (!cpu_idle_pc_state[cpu] && !cpu_isolated(cpu))
+			ping_mask |= BIT(cpu);
 	}
+	final_alive_mask = ping_mask | BIT(this_cpu);
+	for_each_cpu(cpu, to_cpumask(&ping_mask)) {
+		generic_exec_single(cpu, per_cpu_ptr(&csd_data, cpu),
+				    keep_alive_response,
+				    (void *)(BIT(cpu + 32) | final_alive_mask));
+	}
+	preempt_enable();
+
+	atomic_set(&wdog_dd->pinged_mask, final_alive_mask);
+	while (1) {
+		set_current_state(TASK_UNINTERRUPTIBLE);
+		if (atomic_read(&wdog_dd->alive_mask) == final_alive_mask)
+			break;
+		schedule();
+	}
+	__set_current_state(TASK_RUNNING);
 }
 
 static void pet_task_wakeup(unsigned long data)
@@ -414,7 +457,6 @@ static __ref int watchdog_kthread(void *arg)
 		(struct msm_watchdog_data *)arg;
 	unsigned long delay_time = 0;
 	struct sched_param param = {.sched_priority = MAX_RT_PRIO-1};
-
 	sched_setscheduler(current, SCHED_FIFO, &param);
 	while (!kthread_should_stop()) {
 		while (wait_event_interruptible(
@@ -871,7 +913,7 @@ static int msm_watchdog_probe(struct platform_device *pdev)
 	wdog_data = wdog_dd;
 	wdog_dd->dev = &pdev->dev;
 	platform_set_drvdata(pdev, wdog_dd);
-	cpumask_clear(&wdog_dd->alive_mask);
+	// cpumask_clear(&wdog_dd->alive_mask);
 	wdog_dd->watchdog_task = kthread_create(watchdog_kthread, wdog_dd,
 			"msm_watchdog");
 	if (IS_ERR(wdog_dd->watchdog_task)) {
