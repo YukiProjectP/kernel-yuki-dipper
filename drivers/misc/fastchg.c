@@ -27,11 +27,7 @@
 #include <linux/string.h>
 #include <linux/module.h>
 
-<<<<<<< HEAD
 int force_fast_charge = 1;
-=======
-int force_fast_charge = 0;
->>>>>>> 77e2807ad235... add fast charge & add flickerfree mod switch
 
 static int __init get_fastcharge_opt(char *ffc)
 {
