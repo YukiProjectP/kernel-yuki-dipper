@@ -24,3 +24,5 @@ SUBARCH=arm64 \
 CC=/home/pp/proton-clang-20210522/bin/clang \
 CROSS_COMPILE=/home/pp/proton-clang-20210522/bin/aarch64-linux-gnu- \
 CROSS_COMPILE_ARM32=/home/pp/proton-clang-20210522/bin/arm-linux-gnueabi-
+
+cp out/arch/arm64/boot/Image.gz-dtb /mnt/e/
