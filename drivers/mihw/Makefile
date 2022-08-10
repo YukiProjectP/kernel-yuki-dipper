@@ -1,3 +1,4 @@
-obj-$(CONFIG_MILLET)			+= millet_core.o
-obj-$(CONFIG_MILLET)			+= millet_pkg.o
-obj-$(CONFIG_MILLET)			+= millet_hs.o
+obj-y   += millet/
+obj-y   += mi_sched/
+obj-y   += game/
+obj-y	+= turbo_sched/
