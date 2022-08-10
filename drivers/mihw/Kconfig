@@ -57,6 +57,7 @@ config MI_SCHED
 config MIGT
 	tristate "mi game turbo"
 	depends on MI_SCHED && SCHED_WALT && MIGT_WALT
+	default y
 	help
 	  Improve game peformance and power.
 
