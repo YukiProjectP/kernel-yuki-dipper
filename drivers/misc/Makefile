@@ -91,7 +91,3 @@ $(obj)/lkdtm_rodata_objcopy.o: $(obj)/lkdtm_rodata.o FORCE
 obj-$(CONFIG_OKL4_LINK_SHBUF)    += okl4-link-shbuf.o
 obj-$(CONFIG_FORCE_FAST_CHARGE) += fastchg.o
 obj-y               += mi-ioturbo/
-obj-$(CONFIG_AKM09970)          += akm09970.o
-obj-$(CONFIG_TI_DRV8846) 	+= drv8846.o
-obj-$(CONFIG_SIMTRAY_STATUS) += simtray.o
-obj-y				+= lyb_taskmmu.o
