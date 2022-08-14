@@ -7,16 +7,16 @@ qcom,e1_coslight_3400mAh {
 	qcom,fg-cc-cv-threshold-mv = <4390>;
 	qcom,battery-type = "e1_coslight_3400mAh";
 	qcom,fastchg-current-ma = <3300>;
-	qcom,jeita-fcc-ranges = <0   50   330000
-			51  100  990000
-			101 150  1650000
+	qcom,jeita-fcc-ranges = <0   50   3300000
+			51  100  3300000
+			101 150  3300000
 			151 450  3300000
-			451 600  1650000>;
+			451 600  3300000>;
 	qcom,jeita-fv-ranges =  <0   50   4400000
 			51  100  4400000
 			101 150  4400000
 			151 450  4400000
-			451 600  4100000>;
+			451 600  4400000>;
 	qcom,dynamic-fv-ranges = <0    100  4400000
 			101  200  4380000
 			201  300  4360000
