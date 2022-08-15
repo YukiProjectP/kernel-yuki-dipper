@@ -1,8 +1,8 @@
 VERSION = 4
 PATCHLEVEL = 9
 SUBLEVEL = 316
-EXTRAVERSION = -Yuki-A1
-NAME = Roaring Lionus
+EXTRAVERSION = -Yuki-Re1
+NAME = PP
 
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"
