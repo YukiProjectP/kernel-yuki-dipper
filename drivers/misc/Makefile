@@ -1,7 +1,7 @@
 #
 # Makefile for misc devices that really don't fit anywhere else.
 #
-ccflags-y += -I$(srctree)/drivers/misc/hwid/
+
 obj-$(CONFIG_IBM_ASM)		+= ibmasm/
 obj-$(CONFIG_AD525X_DPOT)	+= ad525x_dpot.o
 obj-$(CONFIG_AD525X_DPOT_I2C)	+= ad525x_dpot-i2c.o
@@ -90,4 +90,3 @@ $(obj)/lkdtm_rodata_objcopy.o: $(obj)/lkdtm_rodata.o FORCE
 
 obj-$(CONFIG_OKL4_LINK_SHBUF)    += okl4-link-shbuf.o
 obj-$(CONFIG_FORCE_FAST_CHARGE) += fastchg.o
-obj-y               += mi-ioturbo/
