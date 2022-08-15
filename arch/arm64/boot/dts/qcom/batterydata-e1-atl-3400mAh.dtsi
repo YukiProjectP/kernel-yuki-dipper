@@ -4,7 +4,7 @@ qcom,e1_atl_3400mAh {
 	qcom,nom-batt-capacity-mah = <3400>;
 	qcom,batt-id-kohm = <68>;
 	qcom,battery-beta = <3380>;
-	qcom,fg-cc-cv-threshold-mv = <4390>;
+	qcom,fg-cc-cv-threshold-mv = <4400>;
 	qcom,battery-type = "e1_atl_3400mAh";
 	qcom,fastchg-current-ma = <3300>;
 	qcom,jeita-fcc-ranges = <0   50   3300000
@@ -18,10 +18,10 @@ qcom,e1_atl_3400mAh {
 			151 450  4400000
 			451 600  4400000>;
         qcom,dynamic-fv-ranges = <0    100  4400000
-			101  200  4380000
-			201  300  4360000
-			301  400  4340000
-			401  500  4340000>;
+			101  200  4400000
+			201  300  4400000
+			301  400  4400000
+			401  500  4400000>;
 	qcom,checksum = <0xC3C7>;
 	qcom,gui-version = "PMI8998GUI - 2.0.0.58";
 	qcom,fg-profile-data = [
